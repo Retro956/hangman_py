@@ -1,7 +1,7 @@
 from random import randint
+from os import system, name
 import re
 import json
-from os import system, name
 
 class Game:
     def __init__(self):
@@ -11,16 +11,19 @@ class Game:
         self.found_chars = []
         self.found_count = 0
         self.missed = 0
+        self.missed_chars = []
 
     def check_win(self):
         if self.found_count == len(self.found_chars):
             print("YOU WIN!")
             self.running = False
-            print("The word was: ", self.secret)
+            print("The word was: ", end="")
+            print(*self.secret, sep="")
         elif self.missed > 5:
             print("YOU LOSE!")
             self.running = False
-            print("The word was: ", self.secret)
+            print("The word was: ", end="")
+            print(*self.secret, sep="")
 
     def clear_screen(self):
         if name == 'nt':
@@ -41,6 +44,7 @@ class Game:
                 self.found_count += 1
         else:
             self.missed += 1
+            self.missed_chars.append(char)
 
     def init_secret(self):
         f = open('words.json')
@@ -56,9 +60,19 @@ class Game:
 def main():
     game = Game()
     game.init_secret()
+    game.clear_screen()
 
     while game.running:
-        print(game.found_chars)
+        if game.missed > 0:
+            print("Missed Characters: ", end="")
+            for x in range(0, len(game.missed_chars)):
+                if x == 0:
+                    print(game.missed_chars[x], end="")
+                else:
+                    print(", " + game.missed_chars[x], end="")
+            print(" ")
+
+        print(*game.found_chars, sep=" ")
         player_guess = input("Guess a letter: ")
         game.clear_screen()
         game.guess(player_guess)
